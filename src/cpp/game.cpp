@@ -3,7 +3,7 @@
 
 using namespace std;
 
-Game::Game(int w, int h, const char* title): W(w), H(h), lastUpdated(0)
+Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0)
 {
   cout<<"Initing everything"<<endl;
   if(SDL_Init(SDL_INIT_EVERYTHING)!=0)
@@ -41,22 +41,52 @@ Game::Game(int w, int h, const char* title): W(w), H(h), lastUpdated(0)
   cout<<"Inited successfully"<<endl;
 }
 
-void Game::RunFrame() {
+bool Game::eventloop() {
+  bool notquit = true;
   SDL_Event e;
+  
   while(SDL_PollEvent(&e)) {
     switch(e.type) {
     case SDL_QUIT:
       cout<<"Not running!"<<endl;
-      running = false;
+      notquit = running = false;
       break;
     case SDL_MOUSEBUTTONDOWN:
-      cout<<"Implement dragging here"<<endl;
+      cout<<"Dragging"<<endl;
+      dragging = true;
       break;
     case SDL_MOUSEBUTTONUP:
-      cout<<"Implement drag-stop here"<<endl;
+      cout<<"Not dragging"<<endl;
+      dragging = false;
       break;
     }
- } 
+  }
+
+  return notquit;
+}
+
+template<typename T>
+bool contains(vector<T> vec, T val) {
+  for(auto i = vec.begin(); i != vec.end(); i++) {
+    if(*i == val) return true;
+  }
+  return false;
+}
+
+void Game::RunFrame() {
+  if(!eventloop()) return;
+
+  if(dragging) {
+    int x, y;
+    if(SDL_GetMouseState(&x, &y)) {
+      pair<int, int> coord(x, y);
+
+      if(!contains<pair<int, int>>(where_dragged, coord)) {
+	where_dragged.push_back(coord);
+	printf("Pushed coordinates [%d, %d] to container\n", x, y);
+      }
+    }
+  }
 }
 
 Game::~Game() {
