@@ -65,6 +65,11 @@ bool Game::eventloop() {
   return notquit;
 }
 
+bool operator==(pair<int, int> a, pair<int, int> b) {
+  return a.first == b.first && a.second == b.second;
+}
+  
+
 template<typename T>
 bool contains(vector<T> vec, T val) {
   for(auto i = vec.begin(); i != vec.end(); i++) {
