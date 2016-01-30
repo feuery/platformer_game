@@ -7,18 +7,35 @@
 #include <utility>
 
 #include <object_type.h>
+#include <object.h>
+
 /*
  * pelaajan spawn_point
+ * - Vakiokokoinen
  * kolikoton block
+ * - Vakiokokoinen
  * rautatiesilta
+ * - Vakiokokoinen
+ * - millä frameilla törmäys tappaa?
  * warp_start
+ * - Vakiokokoinen
+ * - ID:n perusteella määrätään mikä johtaa mihinkin
  * warp_end
+ * - Vakiokokoinen
+ * - ID:n perusteella määrätään mikä johtaa mihinkin
  * kolikollinen_block
+ * - Vakiokokoinen
+ * - Aina 5 coinia
  * rautapätkä_alku
+ * - Vakiokokoinen
  * rautapätkä_loppu
+ * - Vakiokokoinen
  * rautapätkä_väli
+ * - Vakiokokoinen
  * taskulamppuvartija
+ * - Vakiokokoinen
  * maaliblokki
+ * - Vakiokokoinen
  */
 
 using namespace std;
@@ -59,7 +76,7 @@ private:
 
   void draw_hud();
 
-  vector<pair<int, int>> where_dragged;
+  vector<Object*> to_clear;
 };
 
 #endif //GAME_H

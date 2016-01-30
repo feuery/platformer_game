@@ -18,6 +18,7 @@ object_type operator ++ (object_type &type, int) ;
 object_type operator -- (object_type &type, int) ;
 
 const char* otype_to_string(object_type t) ;
+void otype_to_rgb(object_type& type, int& r, int& g, int& b);
     
   
 #endif //OBJECT_TYPES_H

@@ -95,6 +95,8 @@ bool contains(vector<T> vec, T val) {
   return false;
 }
 
+
+
 void Game::RunFrame() {
   //If eventloop says we're to quit, don't bother drawing another frame
   if(!eventloop()) return;
@@ -102,11 +104,16 @@ void Game::RunFrame() {
   if(dragging) {
     int x, y;
     if(SDL_GetMouseState(&x, &y)) {
-      pair<int, int> coord(x, y);
 
-      if(!contains<pair<int, int>>(where_dragged, coord)) {
-	where_dragged.push_back(coord);
-	printf("Pushed coordinates [%d, %d] to container\n", x, y);
+      int r = 0, g = 0, b = 0;
+      int w = 80, h = 100;
+
+      if(!Object::collides(x, y)) {
+	otype_to_rgb(current_type, r, g, b);
+	Object* obj = new Object(r, g, b, w, h);
+	obj->X = x;
+	obj->Y = y;
+	to_clear.push_back(obj);
       }
     }
   }
@@ -127,9 +134,14 @@ void Game::draw_hud() {
 }
 
 void Game::drawobjects(){
+  printf("Drawing %d objects\n", Object::objects.size());
+
   for(auto obj_it = Object::objects.begin(); obj_it != Object::objects.end(); obj_it++) {
+  
     (*obj_it)->draw(window_surface, camera_x, camera_y);
   }
+
+  printf("Drawing finished\n");
 }
 
 
@@ -138,4 +150,6 @@ SDL_Surface* Game::to_surface(const char* str) {
 }
 
 Game::~Game() {
+  for(auto it = to_clear.begin(); it != to_clear.end(); it++)
+    delete *it;
 }

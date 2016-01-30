@@ -31,3 +31,45 @@ const char* otype_to_string(object_type t) {
 
     else return "Unknown object_type";
 }
+
+void otype_to_rgb(object_type& type, int& r, int& g, int& b) {
+  switch (type) {
+  case start:
+    r = 255;
+    break;
+  case coinless_block:
+    r = g = b = 0;
+    break;
+  case railway_bridge:
+    b = 255;
+    break;
+  case warp_start:
+    g = b = 255;
+    break;
+  case warp_end:
+    b = 255;
+    break;
+  case coin_block:
+    r = 255;
+    g = 255;
+    break;
+  case railway_start:
+    b = 255;
+    r = g = 128;
+    break;
+  case railway_end:
+    r = 255;
+    b = g = 128;
+    break;
+  case railway:
+    g = 255;
+    r = b = 128;
+    break;
+  case flashlight_guard:
+    r = g = b = 128;
+    break;
+  case finish:
+    r = 255;
+    break;
+  }
+}
