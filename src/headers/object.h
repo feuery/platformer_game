@@ -12,7 +12,7 @@ public:
   Object(const char* path);
   Object(SDL_Surface* img);
 
-  static vector<Object*> objects
+  static vector<Object*> objects;
   int X, Y;
 
   virtual void draw(SDL_Surface* window, int camera_x, int camera_y);

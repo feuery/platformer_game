@@ -1,12 +1,14 @@
 #include <object.h>
 #include <SDL_image.h>
 
-Object::Object(const char* path): should_free_img(true), img(IMG_Load(path)), X(0), Y(0)
+vector<Object*> Object::objects;
+
+Object::Object(const char* path): img(IMG_Load(path)), should_free_img(true), X(0), Y(0)
 {
   objects.push_back(this);
 }
 
-Object::Object(SDL_Surface* img): should_free_img(false), img(img), X(0), Y(0)
+Object::Object(SDL_Surface* img): img(img), should_free_img(false), X(0), Y(0)
 {
   objects.push_back(this);
 }
