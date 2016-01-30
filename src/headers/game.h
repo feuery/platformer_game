@@ -23,11 +23,13 @@ private:
 
   //returns false on quit
   bool eventloop();
+
+  void drawobjects();
   
   SDL_Window* window;
   SDL_Surface* window_surface;
 
-  int W, H;
+  int W, H, camera_x, camera_y;
   bool running, dragging;
 
   Uint32 lastUpdated;

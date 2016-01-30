@@ -1,9 +1,10 @@
 #include <game.h>
+#include <object.h>
 #include <iostream>
 
 using namespace std;
 
-Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0)
+Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0)
 {
   cout<<"Initing everything"<<endl;
   if(SDL_Init(SDL_INIT_EVERYTHING)!=0)
@@ -79,6 +80,7 @@ bool contains(vector<T> vec, T val) {
 }
 
 void Game::RunFrame() {
+  //If eventloop says we're to quit, don't bother drawing another frame
   if(!eventloop()) return;
 
   if(dragging) {
@@ -92,7 +94,16 @@ void Game::RunFrame() {
       }
     }
   }
+
+  drawobjects();
 }
+
+void Game::drawobjects(){
+  for(auto obj_it = Object::objects.begin(); obj_it != Object::objects.end(); obj_it++) {
+    (*obj_it)->draw(window_surface, camera_x, camera_y);
+  }
+}
+
 
 Game::~Game() {
 }
