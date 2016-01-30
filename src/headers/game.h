@@ -58,13 +58,14 @@ private:
   //returns false on quit
   bool eventloop();
   void do_kbd_up(SDL_Event& e);
+  void do_kbd_down(SDL_Event& e);
 
   void drawobjects();
   
   SDL_Window* window;
   SDL_Surface* window_surface;
 
-  int W, H, camera_x, camera_y;
+  int W, H, camera_x, camera_y, camera_speed;
   bool running, dragging;
 
   Uint32 lastUpdated;

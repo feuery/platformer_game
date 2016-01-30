@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0), running(false)
+Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0), running(false), camera_speed(10)
 {
   cout<<"Initing everything"<<endl;
   if(SDL_Init(SDL_INIT_EVERYTHING)!=0)
@@ -56,6 +56,30 @@ void Game::do_kbd_up(SDL_Event& e) {
   }
 }
 
+void Game::do_kbd_down(SDL_Event& e) {
+  switch(e.key.keysym.sym) {
+  case SDLK_a:
+    camera_x-= camera_speed;
+    break;
+  case SDLK_s:
+    camera_y+= camera_speed;
+    break;
+  case SDLK_d:
+    camera_x+= camera_speed;
+    break;
+  case SDLK_w:
+    camera_y-= camera_speed;
+    break;
+
+  case SDLK_e:
+    camera_speed += 5;
+    break;
+  case SDLK_f:
+    camera_speed -= 5;
+    break;    
+  }
+}
+
 bool Game::eventloop() {
   bool notquit = true;
   SDL_Event e;
@@ -77,6 +101,9 @@ bool Game::eventloop() {
 
     case SDL_KEYUP:
       do_kbd_up(e);
+      break;
+    case SDL_KEYDOWN:
+      do_kbd_down(e);
       break;
     }
   }
@@ -136,7 +163,22 @@ void Game::draw_hud() {
   SDL_Rect text_location = {10, 10, 0, 0};
   SDL_BlitSurface(text, NULL, window_surface, &text_location);
 
+  SDL_Surface* camera_text = to_surface("Use WASD to move camera");
+  int new_y = 15 + text->h;
+  text_location = {10, new_y, 0, 0};
+  SDL_BlitSurface(camera_text, NULL, window_surface, &text_location);
+
+  string increase_str_text = "Use F and E to incr and decr camera speed (";
+  increase_str_text += std::to_string(camera_speed) + ")";
+  
+  SDL_Surface* increase_text = to_surface(increase_str_text.c_str());
+  new_y += camera_text->h + 5;
+  text_location = {10, new_y, 0, 0};
+  SDL_BlitSurface(increase_text, NULL, window_surface, &text_location);
+  
   SDL_FreeSurface(text);
+  SDL_FreeSurface(camera_text);
+  SDL_FreeSurface(increase_text);
 }
 
 void Game::drawobjects(){
