@@ -129,7 +129,10 @@ void Game::place_narrow_object(int x, int y) {
   else delete obj;
 }
 
+//this function adds camera translation to its params
 void Game::place_wide_object(int x, int y) {
+  x = x + camera_x;
+  y = y + camera_y;
   first_set_mouse_unrisen = true;
   
   if(!setting_wide_obj) {
