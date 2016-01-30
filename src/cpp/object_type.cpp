@@ -73,3 +73,14 @@ void otype_to_rgb(object_type& type, int& r, int& g, int& b) {
     break;
   }
 }
+
+int amount_of_otypes_allowed(object_type type) {
+  switch (type) {
+  case start:
+  case finish:
+    return 1;
+
+  default:
+    return UNLIMITED;
+  }
+}

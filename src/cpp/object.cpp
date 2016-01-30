@@ -3,7 +3,7 @@
 
 vector<Object*> Object::objects;
 
-Object::Object(int r, int g, int b, int W, int H): X(0), Y(0), visible(true), should_free_img(true)
+Object::Object(int r, int g, int b, int W, int H, object_type t): X(0), Y(0), visible(true), should_free_img(true), type(t)
 {
   Uint32 rmask, gmask, bmask, amask;
 
@@ -27,12 +27,12 @@ Object::Object(int r, int g, int b, int W, int H): X(0), Y(0), visible(true), sh
   objects.push_back(this);
 }
 
-Object::Object(const char* path): img(IMG_Load(path)), should_free_img(true), X(0), Y(0), visible(true)
+Object::Object(const char* path, object_type t): img(IMG_Load(path)), should_free_img(true), X(0), Y(0), visible(true), type(t)
 {
   objects.push_back(this);
 }
 
-Object::Object(SDL_Surface* img): img(img), should_free_img(false), X(0), Y(0), visible(true)
+Object::Object(SDL_Surface* img, object_type t): img(img), should_free_img(false), X(0), Y(0), visible(true), type(t)
 {
   objects.push_back(this);
 }
@@ -82,4 +82,13 @@ bool Object::collides(int x_1, int y_1, int width_1, int height_1)
   }
 
   return false;
+}
+
+int Object::amount_of_otype(object_type t) {
+  int amount = 0;
+  for(auto it = objects.begin(); it < objects.end(); it++) {
+    if((*it)->type == t) amount++;
+  }
+
+  return amount;
 }

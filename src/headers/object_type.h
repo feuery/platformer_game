@@ -19,6 +19,9 @@ object_type operator -- (object_type &type, int) ;
 
 const char* otype_to_string(object_type t) ;
 void otype_to_rgb(object_type& type, int& r, int& g, int& b);
+
+const int UNLIMITED = 9999;
+int amount_of_otypes_allowed(object_type type);
     
   
 #endif //OBJECT_TYPES_H

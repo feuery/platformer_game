@@ -3,19 +3,20 @@
 
 #include <SDL.h>
 #include <vector>
+#include <object_type.h>
 
 using namespace std;
 
 class Object{
 public:
 
-  Object(int r, int g, int b, int W, int H);
-  Object(const char* path);
-  Object(SDL_Surface* img);
+  Object(int r, int g, int b, int W, int H, object_type t);
+  Object(const char* path, object_type t);
+  Object(SDL_Surface* img, object_type t);
 
   static vector<Object*> objects;
-
   static bool collides(int x_1, int y_1, int width_1, int height_1);
+  static int amount_of_otype(object_type t);
   
   int X, Y;
   bool visible;
@@ -25,11 +26,13 @@ public:
   int getW();
   int getH();
   
-  ~Object();
+  virtual ~Object();
 private:
   
   SDL_Surface* img;
   bool should_free_img;
+
+  object_type type;
 };
 
 #endif //OBJECT_H

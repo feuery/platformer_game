@@ -1,5 +1,7 @@
 #include <game.h>
 #include <object.h>
+#include <object_type.h>
+
 #include <iostream>
 #include <string>
 
@@ -108,9 +110,12 @@ void Game::RunFrame() {
       int r = 0, g = 0, b = 0;
       int w = 80, h = 100;
       printf("Amount of objects %d\n", Object::objects.size());
-      if(!Object::collides(x, y, w, h)) {
+      printf("Amount of objects of type %s: %d\n", otype_to_string(current_type), Object::amount_of_otype(current_type));
+
+      if(Object::amount_of_otype(current_type) < amount_of_otypes_allowed(current_type) &&
+	 !Object::collides(x, y, w, h)) {
 	otype_to_rgb(current_type, r, g, b);
-	Object* obj = new Object(r, g, b, w, h);
+	Object* obj = new Object(r, g, b, w, h, current_type);
 	obj->X = x;
 	obj->Y = y;
 	to_clear.push_back(obj);
