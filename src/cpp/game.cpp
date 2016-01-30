@@ -1,10 +1,11 @@
 #include <game.h>
 #include <object.h>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
-Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0)
+Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0), running(false)
 {
   cout<<"Initing everything"<<endl;
   if(SDL_Init(SDL_INIT_EVERYTHING)!=0)
@@ -31,7 +32,7 @@ Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastU
 
   if(!font)
     {
-      printf("Loading font failed");
+      printf("Loading font failed\n");
       return;
     }
   
@@ -40,6 +41,17 @@ Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastU
   running = true;
 
   cout<<"Inited successfully"<<endl;
+}
+
+void Game::do_kbd_up(SDL_Event& e) {
+  switch(e.key.keysym.sym) {
+  case SDLK_LEFT:
+    current_type--;
+    break;
+  case SDLK_RIGHT:
+    current_type++;
+    break;
+  }
 }
 
 bool Game::eventloop() {
@@ -59,6 +71,10 @@ bool Game::eventloop() {
     case SDL_MOUSEBUTTONUP:
       cout<<"Not dragging"<<endl;
       dragging = false;
+      break;
+
+    case SDL_KEYUP:
+      do_kbd_up(e);
       break;
     }
   }
@@ -96,6 +112,18 @@ void Game::RunFrame() {
   }
 
   drawobjects();
+  draw_hud();
+
+  SDL_UpdateWindowSurface(window);
+  SDL_FillRect(window_surface, NULL, SDL_MapRGB(window_surface->format, 0, 0, 0));
+}
+
+void Game::draw_hud() {
+  SDL_Surface* text = to_surface((string("Selected type: ")+otype_to_string(current_type)).c_str());
+  SDL_Rect text_location = {10, 10, 0, 0};
+  SDL_BlitSurface(text, NULL, window_surface, &text_location);
+
+  SDL_FreeSurface(text);
 }
 
 void Game::drawobjects(){
@@ -104,6 +132,10 @@ void Game::drawobjects(){
   }
 }
 
+
+SDL_Surface* Game::to_surface(const char* str) {
+  return TTF_RenderUTF8_Solid(font, str, {0xFF, 0xFF, 0xFF});
+}
 
 Game::~Game() {
 }
