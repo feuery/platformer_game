@@ -10,9 +10,10 @@ using namespace std;
 class Object{
 public:
 
-  Object(int r, int g, int b, int W, int H, object_type t);
+  // Object(int r, int g, int b, int W, int H, object_type t);
   Object(const char* path, object_type t);
   Object(SDL_Surface* img, object_type t);
+  Object(object_type t);
 
   static vector<Object*> objects;
   static bool collides(int x_1, int y_1, int width_1, int height_1);
@@ -33,6 +34,8 @@ private:
   bool should_free_img;
 
   object_type type;
+
+  void init_object(int r, int g, int b, int W, int H);
 };
 
 #endif //OBJECT_H

@@ -7,7 +7,13 @@
 
 using namespace std;
 
-Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0), running(false), camera_speed(10)
+int etsi_lahin_tasan_jaettava(int n, int divisor)
+{
+  int nn = n / divisor;
+  return nn * divisor;
+}
+
+Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0), running(false), camera_speed(10), wide_x(0), wide_y(0), setting_wide_obj(false), first_set_mouse_unrisen(false)
 {
   cout<<"Initing everything"<<endl;
   if(SDL_Init(SDL_INIT_EVERYTHING)!=0)
@@ -37,7 +43,7 @@ Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastU
       printf("Loading font failed\n");
       return;
     }
-  
+
   atexit(SDL_Quit);
   atexit(TTF_Quit);
   running = true;
@@ -96,7 +102,7 @@ bool Game::eventloop() {
       break;
     case SDL_MOUSEBUTTONUP:
       cout<<"Not dragging"<<endl;
-      dragging = false;
+      first_set_mouse_unrisen = dragging = false;
       break;
 
     case SDL_KEYUP:
@@ -111,43 +117,58 @@ bool Game::eventloop() {
   return notquit;
 }
 
-bool operator==(pair<int, int> a, pair<int, int> b) {
-  return a.first == b.first && a.second == b.second;
-}
-  
+void Game::place_narrow_object(int x, int y) {
+  Object* obj = new Object(current_type);
+  obj->X = x;
+  obj->Y = y;
 
-template<typename T>
-bool contains(vector<T> vec, T val) {
-  for(auto i = vec.begin(); i != vec.end(); i++) {
-    if(*i == val) return true;
+  if(Object::amount_of_otype(current_type) < amount_of_otypes_allowed(current_type) &&
+     !Object::collides(obj->X, obj->Y, obj->getW(), obj->getH())) {
+    to_clear.push_back(obj);
   }
-  return false;
+  else delete obj;
 }
 
+void Game::place_wide_object(int x, int y) {
+  first_set_mouse_unrisen = true;
+  
+  if(!setting_wide_obj) {
+    wide_x = x;
+    wide_y = y;
+    setting_wide_obj = true;
+    return;
+  }
 
+  Object o(current_type);
+  o.visible = false;
+  
+  int W = o.getW();
+  
+  int higher_x = etsi_lahin_tasan_jaettava(max(x, wide_x), W);
+  int lower_x = etsi_lahin_tasan_jaettava(min(x, wide_x), W);
+
+  for(int in_between_x = lower_x; in_between_x <= higher_x; in_between_x += W) {
+    Object* in_between = new Object(current_type);
+    in_between->X = in_between_x;
+    in_between->Y = wide_y;
+    
+    to_clear.push_back(in_between);
+  }
+
+  setting_wide_obj = false;
+}
 
 void Game::RunFrame() {
   //If eventloop says we're to quit, don't bother drawing another frame
   if(!eventloop()) return;
 
-  if(dragging) {
+  if(dragging && !first_set_mouse_unrisen) {
     int x, y;
     if(SDL_GetMouseState(&x, &y)) {
 
-      int r = 0, g = 0, b = 0;
-      int w = 80, h = 100;
-      printf("Amount of objects %d\n", Object::objects.size());
-      printf("Amount of objects of type %s: %d\n", otype_to_string(current_type), Object::amount_of_otype(current_type));
-
-      if(Object::amount_of_otype(current_type) < amount_of_otypes_allowed(current_type) &&
-	 !Object::collides(x, y, w, h)) {
-	otype_to_rgb(current_type, r, g, b);
-	Object* obj = new Object(r, g, b, w, h, current_type);
-	obj->X = x;
-	obj->Y = y;
-	to_clear.push_back(obj);
-      }
-      printf("Amount of objects %d\n", Object::objects.size());
+      if (otype_is_wide(current_type)) place_wide_object(x, y);
+      else place_narrow_object(x, y);
+ 
     }
   }
 
@@ -175,10 +196,16 @@ void Game::draw_hud() {
   new_y += camera_text->h + 5;
   text_location = {10, new_y, 0, 0};
   SDL_BlitSurface(increase_text, NULL, window_surface, &text_location);
+
+  SDL_Surface* setting_wide_surface = to_surface(setting_wide_obj? "Setting wide objects": "Not setting wide objects");
+  new_y += increase_text->h + 5;
+  text_location = {10, new_y, 0, 0};
+  SDL_BlitSurface(setting_wide_surface, NULL, window_surface, &text_location);
   
   SDL_FreeSurface(text);
   SDL_FreeSurface(camera_text);
   SDL_FreeSurface(increase_text);
+  SDL_FreeSurface(setting_wide_surface);
 }
 
 void Game::drawobjects(){

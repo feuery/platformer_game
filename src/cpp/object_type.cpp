@@ -23,8 +23,8 @@ const char* otype_to_string(object_type t) {
     else if (t == warp_start) return "warp_start";
     else if (t == warp_end) return "warp_end";
     else if (t == coin_block) return "coin_block";
-    else if (t == railway_start) return "railway_start";
-    else if (t == railway_end) return "railway_end";
+    // else if (t == railway_start) return "railway_start";
+    // else if (t == railway_end) return "railway_end";
     else if (t == railway) return "railway";
     else if (t == flashlight_guard) return "flashlight_guard";
     else if (t == finish) return "finish";
@@ -53,14 +53,14 @@ void otype_to_rgb(object_type& type, int& r, int& g, int& b) {
     r = 255;
     g = 255;
     break;
-  case railway_start:
-    b = 255;
-    r = g = 128;
-    break;
-  case railway_end:
-    r = 255;
-    b = g = 128;
-    break;
+  // case railway_start:
+  //   b = 255;
+  //   r = g = 128;
+  //   break;
+  // case railway_end:
+  //   r = 255;
+  //   b = g = 128;
+  //   break;
   case railway:
     g = 255;
     r = b = 128;
@@ -82,5 +82,16 @@ int amount_of_otypes_allowed(object_type type) {
 
   default:
     return UNLIMITED;
+  }
+}
+
+bool otype_is_wide(object_type t) {
+  switch(t) {
+  case coinless_block:
+  case railway:
+  case coin_block:
+    return true;
+
+  default: return false;
   }
 }

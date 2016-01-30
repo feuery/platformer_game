@@ -3,8 +3,42 @@
 
 vector<Object*> Object::objects;
 
-Object::Object(int r, int g, int b, int W, int H, object_type t): X(0), Y(0), visible(true), should_free_img(true), type(t)
+Object::Object(const char* path, object_type t): img(IMG_Load(path)), should_free_img(true), X(0), Y(0), visible(true), type(t)
 {
+  objects.push_back(this);
+}
+
+Object::Object(SDL_Surface* img, object_type t): img(img), should_free_img(false), X(0), Y(0), visible(true), type(t)
+{
+  objects.push_back(this);
+}
+
+Object::Object(object_type t): type(t), X(0), Y(0), visible(true), should_free_img(true) {
+  int r = 0, g = 0, b = 0;
+  int w = 80, h = 100;
+
+  otype_to_rgb(t, r, g, b);
+  init_object(r, g, b, w, h);
+    
+  objects.push_back(this);
+}
+
+Object::~Object()
+{
+  for(auto it = objects.begin(); it != objects.end(); it++) {
+    if(*it == this) {
+      objects.erase(it);
+      break;
+    }
+  }      
+  
+  if(!should_free_img) return;
+
+  SDL_FreeSurface(img);
+}
+
+void Object::init_object(int r, int g, int b, int W, int H) {
+
   Uint32 rmask, gmask, bmask, amask;
 
   /* SDL interprets each pixel as a 32-bit number, so our masks must depend
@@ -23,34 +57,8 @@ Object::Object(int r, int g, int b, int W, int H, object_type t): X(0), Y(0), vi
 
   img = SDL_CreateRGBSurface(0, W, H, 32, rmask, gmask, bmask, amask);
   SDL_FillRect(img, NULL, SDL_MapRGB(img->format, r, g, b));
-
-  objects.push_back(this);
 }
 
-Object::Object(const char* path, object_type t): img(IMG_Load(path)), should_free_img(true), X(0), Y(0), visible(true), type(t)
-{
-  objects.push_back(this);
-}
-
-Object::Object(SDL_Surface* img, object_type t): img(img), should_free_img(false), X(0), Y(0), visible(true), type(t)
-{
-  objects.push_back(this);
-}
-
-Object::~Object()
-{
-  for(auto it = objects.begin(); it != objects.end(); it++) {
-    if(*it == this) {
-      objects.erase(it);
-      break;
-    }
-  }      
-  
-  if(!should_free_img) return;
-
-  SDL_FreeSurface(img);
-}
-  
 void Object::draw(SDL_Surface* window, int camera_x, int camera_y)
 {
   if(!visible) return;

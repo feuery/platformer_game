@@ -5,9 +5,11 @@
 #include <SDL_ttf.h>
 #include <vector>
 #include <utility>
+#include <queue>
 
 #include <object_type.h>
 #include <object.h>
+
 
 /*
  * pelaajan spawn_point
@@ -60,6 +62,9 @@ private:
   void do_kbd_up(SDL_Event& e);
   void do_kbd_down(SDL_Event& e);
 
+  void place_narrow_object(int x, int y);
+  void place_wide_object(int x, int y);
+
   void drawobjects();
   
   SDL_Window* window;
@@ -78,6 +83,9 @@ private:
   void draw_hud();
 
   vector<Object*> to_clear;
+
+  int wide_x, wide_y;
+  bool setting_wide_obj, first_set_mouse_unrisen;
 };
 
 #endif //GAME_H
