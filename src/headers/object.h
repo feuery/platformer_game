@@ -24,6 +24,9 @@ public:
 
   virtual void draw(SDL_Surface* window, int camera_x, int camera_y);
 
+  void RemoveFromQueue();
+  void AddToQueue();
+
   int getW();
   int getH();
   

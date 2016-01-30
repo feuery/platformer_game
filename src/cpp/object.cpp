@@ -100,3 +100,16 @@ int Object::amount_of_otype(object_type t) {
 
   return amount;
 }
+
+void Object::RemoveFromQueue() {
+  for(auto it = objects.begin(); it < objects.end(); it++) {
+    if(*it == this) {
+      objects.erase(it);
+      return;
+    }
+  }
+}
+
+void Object::AddToQueue() {
+  objects.push_back(this);
+}

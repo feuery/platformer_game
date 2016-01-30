@@ -38,10 +38,12 @@ void otype_to_rgb(object_type& type, int& r, int& g, int& b) {
     r = 255;
     break;
   case coinless_block:
-    r = g = b = 0;
+    r = 128;
+    g = 68;
+    b = 0;
     break;
   case railway_bridge:
-    b = 255;
+    g = 255;
     break;
   case warp_start:
     g = b = 255;

@@ -118,21 +118,38 @@ bool Game::eventloop() {
 }
 
 void Game::place_narrow_object(int x, int y) {
+
+  bool not_too_many = Object::amount_of_otype(current_type) < amount_of_otypes_allowed(current_type);
+
   Object* obj = new Object(current_type);
   obj->X = x;
   obj->Y = y;
-
-  if(Object::amount_of_otype(current_type) < amount_of_otypes_allowed(current_type) &&
-     !Object::collides(obj->X, obj->Y, obj->getW(), obj->getH())) {
+  obj->RemoveFromQueue();
+  
+  bool collides_not = !Object::collides(obj->X, obj->Y, obj->getW(), obj->getH());
+  
+  if(not_too_many && collides_not) {
+    printf("narrow object of type %s created\n", otype_to_string(current_type));
+    
     to_clear.push_back(obj);
+    obj->AddToQueue();
   }
-  else delete obj;
+  else {
+    printf("no narrow object created because \"%s\"\n", !not_too_many?
+	   "too many of current_type already exists":
+	   !collides_not?
+	   "narrow object collides with a thing":
+	   "unknown error"
+	   );
+    printf("amount of objects with current type (%s) is %d\n", otype_to_string(current_type), Object::amount_of_otype(current_type));
+    printf("Amount of objects %d\n", Object::objects.size());
+    delete obj;
+
+    printf("Amount of objects %d after deleting current object\n", Object::objects.size());
+  }
 }
 
-//this function adds camera translation to its params
 void Game::place_wide_object(int x, int y) {
-  x = x + camera_x;
-  y = y + camera_y;
   first_set_mouse_unrisen = true;
   
   if(!setting_wide_obj) {
@@ -168,7 +185,8 @@ void Game::RunFrame() {
   if(dragging && !first_set_mouse_unrisen) {
     int x, y;
     if(SDL_GetMouseState(&x, &y)) {
-
+      x += camera_x;
+      y += camera_y;
       if (otype_is_wide(current_type)) place_wide_object(x, y);
       else place_narrow_object(x, y);
  
