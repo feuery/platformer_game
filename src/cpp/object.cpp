@@ -62,19 +62,23 @@ void Object::draw(SDL_Surface* window, int camera_x, int camera_y)
 }
 
 int Object::getW() {
+  printf("Object::getW() -> %d\n", img->w);
   return img->w;
 }
 
 int Object::getH() {
+  printf("Object::getH() -> %d\n", img->h);
   return img->h;
 }
 
-bool Object::collides(int x, int y)
+bool Object::collides(int x_1, int y_1, int width_1, int height_1)
 {
+  
   for(auto it = objects.begin(); it != objects.end(); it++) {
-    if(x > (*it)->X && x < (*it)->X + (*it)->getW() &&
-       y > (*it)->Y && y < (*it)->Y + (*it)-> getH())
-      return true;    
+    int x_2 = (*it)->X, y_2 = (*it)->Y, width_2 = (*it)->getW(), height_2 = (*it)->getH();
+    //could probs. be prittified, but I'm on a time limit here
+    if(!(x_1 > x_2+width_2 || x_1+width_1 < x_2 || y_1 > y_2+height_2 || y_1+height_1 < y_2))
+      return true;
   }
 
   return false;

@@ -15,7 +15,7 @@ public:
 
   static vector<Object*> objects;
 
-  static bool collides(int x, int y);
+  static bool collides(int x_1, int y_1, int width_1, int height_1);
   
   int X, Y;
   bool visible;
