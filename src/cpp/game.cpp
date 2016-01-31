@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -52,6 +53,7 @@ Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastU
 }
 
 void Game::do_kbd_up(SDL_Event& e) {
+  string filename;
   switch(e.key.keysym.sym) {
   case SDLK_LEFT:
     current_type--;
@@ -65,7 +67,6 @@ void Game::do_kbd_up(SDL_Event& e) {
     draw_hud();
     printf("New background filename: \n");
     getline(cin, background_filename);
-
     in_console = false;
     break;
 
@@ -73,13 +74,30 @@ void Game::do_kbd_up(SDL_Event& e) {
     in_console = true;
     draw_hud();
     printf("Filename: \n");
-    string filename;
+    
     getline(cin, filename);
 
-    save_level(filename);
+    if(save_level(filename)) printf("Saving file %s succeeded\n", filename.c_str());
+    else printf("Saving file %s failed\n", filename.c_str());
     
     in_console = false;
     break;
+
+  case SDLK_l:
+    in_console = true;
+    draw_hud();
+    printf("Filename: \n");
+    
+    getline(cin, filename);
+
+    if(load_level(filename)) printf("Loading file %s succeeded\n", filename.c_str());
+    else printf("Loading file %s failed\n", filename.c_str());
+
+    in_console = false;
+    break;
+
+  case SDLK_c:
+    Clear();
   }
 }
 
@@ -295,6 +313,14 @@ void Game::draw_hud() {
   text_location.y += use_console_surface->h + 5;
   SDL_BlitSurface(save_surface, NULL, window_surface, &text_location);
 
+  SDL_Surface* load_surface = to_surface("Press L to load a new level");
+  text_location.y += save_surface->h + 5;
+  SDL_BlitSurface(load_surface, NULL, window_surface, &text_location);
+
+  SDL_Surface* clear_surface = to_surface("Press C to clear level");
+  text_location.y += load_surface->h + 5;
+  SDL_BlitSurface(clear_surface, NULL, window_surface, &text_location);
+
   SDL_FreeSurface(text);
   SDL_FreeSurface(camera_text);
   SDL_FreeSurface(increase_text);
@@ -302,6 +328,8 @@ void Game::draw_hud() {
   SDL_FreeSurface(background_fn_surface);
   SDL_FreeSurface(use_console_surface);
   SDL_FreeSurface(save_surface);
+  SDL_FreeSurface(load_surface);
+  SDL_FreeSurface(clear_surface);
 }
 
 void Game::drawobjects(){
@@ -320,8 +348,91 @@ SDL_Surface* Game::to_surface(const char* str) {
   return TTF_RenderUTF8_Solid(font, str, {0xFF, 0xFF, 0xFF});
 }
 
-void Game::save_level(string& filename) {
-  printf("Saving to %s\n", filename.c_str());
+char* from_f(int& n) {
+  return reinterpret_cast<char *>(&n);
+}
+
+const char* to_f(int& n) {
+  return reinterpret_cast<const char *>(&n);
+}
+
+bool Game::save_level(string& filename) {
+  //first, length of the background filename
+  //then the filename
+  //then [type, x, y] - tuples, all 32-bit ints
+
+  // FILE* f = fopen(filename.c_str(), "w");
+
+  // if(!f) return false;
+
+  ofstream f (filename.c_str(), ios::out | ios::binary);
+
+  if(!f.is_open()) return false;
+
+  printf("Length is %d\n", background_filename.length());
+  f << background_filename.length();
+  
+  f.write(background_filename.c_str(), background_filename.length());
+  
+  for(auto it = to_clear.begin(); it != to_clear.end(); it++) {
+    int type = (int)(**it).type,
+      X = (**it).X,
+      Y = (**it).Y;
+    f.write(to_f(type), sizeof(type));
+    f.write(to_f(X), sizeof(X));
+    f.write(to_f(Y), sizeof(Y));
+  }
+
+  f.close();
+
+  return true;
+}
+
+void Game::Clear()
+{
+  for(auto it = to_clear.begin(); it != to_clear.end(); it++)
+    delete *it;
+  to_clear.clear();
+  
+  for(auto it = Object::objects.begin(); it != Object::objects.end(); it++)
+    delete *it;
+  Object::objects.clear();
+}
+
+bool Game::load_level(string& filename) {
+  ifstream f(filename.c_str(), ios::in);
+
+  if(!f.is_open()) return false;
+
+  int length = 0;
+
+  f >> length;
+  printf("Length of background_filename is supposed to be %d\n", length);
+
+  if (length < 1) return false;
+  
+  Clear();
+  char* buffer = new char[length];
+  f.read(buffer, length);
+
+  background_filename = buffer;
+  
+  while(!f.eof()) {
+    int type, X, Y;
+    f.read(from_f(type), sizeof(type));
+    f.read(from_f(X), sizeof(X));
+    f.read(from_f(Y), sizeof(Y));
+    
+    object_type t = static_cast<object_type>(type);
+    Object* o = new Object(t);
+    o->X = X;
+    o->Y = Y;
+    to_clear.push_back(o);
+
+    printf("Made an object (%s %d, %d, %d)!\n", otype_to_string(t), type, X, Y);
+  }
+
+  return true;
 }
 
 Game::~Game() {

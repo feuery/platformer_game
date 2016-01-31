@@ -29,14 +29,14 @@ public:
 
   int getW();
   int getH();
+
+  object_type type;
   
   virtual ~Object();
 private:
   
   SDL_Surface* img;
   bool should_free_img;
-
-  object_type type;
 
   void init_object(int r, int g, int b, int W, int H);
 };
