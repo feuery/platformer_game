@@ -67,6 +67,19 @@ void Game::do_kbd_up(SDL_Event& e) {
     getline(cin, background_filename);
 
     in_console = false;
+    break;
+
+  case SDLK_SPACE:
+    in_console = true;
+    draw_hud();
+    printf("Filename: \n");
+    string filename;
+    getline(cin, filename);
+
+    save_level(filename);
+    
+    in_console = false;
+    break;
   }
 }
 
@@ -277,13 +290,18 @@ void Game::draw_hud() {
   new_y += background_fn_surface->h + 5;
   text_location = {10, new_y, 0, 0};
   SDL_BlitSurface(use_console_surface, NULL, window_surface, &text_location);
-  
+
+  SDL_Surface* save_surface = to_surface("Press SPACE to save current level");
+  text_location.y += use_console_surface->h + 5;
+  SDL_BlitSurface(save_surface, NULL, window_surface, &text_location);
+
   SDL_FreeSurface(text);
   SDL_FreeSurface(camera_text);
   SDL_FreeSurface(increase_text);
   SDL_FreeSurface(setting_wide_surface);
   SDL_FreeSurface(background_fn_surface);
   SDL_FreeSurface(use_console_surface);
+  SDL_FreeSurface(save_surface);
 }
 
 void Game::drawobjects(){
@@ -300,6 +318,10 @@ void Game::drawobjects(){
 
 SDL_Surface* Game::to_surface(const char* str) {
   return TTF_RenderUTF8_Solid(font, str, {0xFF, 0xFF, 0xFF});
+}
+
+void Game::save_level(string& filename) {
+  printf("Saving to %s\n", filename.c_str());
 }
 
 Game::~Game() {

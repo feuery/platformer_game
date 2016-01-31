@@ -67,6 +67,7 @@ private:
   void place_wide_object(int x, int y);
 
   void drawobjects();
+  void save_level(string& filename);
   
   SDL_Window* window;
   SDL_Surface* window_surface;
