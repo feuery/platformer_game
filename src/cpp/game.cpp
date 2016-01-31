@@ -166,16 +166,40 @@ void Game::place_wide_object(int x, int y) {
   
   int higher_x = etsi_lahin_tasan_jaettava(max(x, wide_x), W);
   int lower_x = etsi_lahin_tasan_jaettava(min(x, wide_x), W);
+  int object_counter = 1;
+  vector<Object*> those_in_between;
+  bool object_collides = false;
 
   for(int in_between_x = lower_x; in_between_x <= higher_x; in_between_x += W) {
     Object* in_between = new Object(current_type);
     in_between->X = in_between_x;
     in_between->Y = wide_y;
+    in_between->RemoveFromQueue();
+
+    if(Object::collides(in_between->X, in_between->Y, in_between->getW(), in_between->getH())) {
+      object_collides = true;
+      printf("Oh noes, %dnth object collides \n", object_counter);
+      break;
+    }
     
-    to_clear.push_back(in_between);
+    those_in_between.push_back(in_between);
+    object_counter++;
   }
 
   setting_wide_obj = false;
+  
+  if(object_collides) {
+    for(auto it = those_in_between.begin(); it != those_in_between.end(); it++) {
+      delete *it;
+    }
+    
+    return;
+  }
+
+  for(auto it = those_in_between.begin(); it != those_in_between.end(); it++) {
+    (*it)->AddToQueue();
+    to_clear.push_back(*it);
+  }
 }
 
 void Game::RunFrame() {
