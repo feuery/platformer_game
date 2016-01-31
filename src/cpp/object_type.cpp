@@ -20,8 +20,9 @@ const char* otype_to_string(object_type t) {
     if (t == start) return "start";
     else if (t == coinless_block) return "coinless_block";
     else if (t == railway_bridge) return "railway_bridge";
-    else if (t == warp_start) return "warp_start";
-    else if (t == warp_end) return "warp_end";
+    // else if (t == warp_start) return "warp_start";
+    // else if (t == warp_end) return "warp_end";
+    else if (t == check_point) return "check_point";
     else if (t == coin_block) return "coin_block";
     // else if (t == railway_start) return "railway_start";
     // else if (t == railway_end) return "railway_end";
@@ -45,10 +46,10 @@ void otype_to_rgb(object_type& type, int& r, int& g, int& b) {
   case railway_bridge:
     g = 255;
     break;
-  case warp_start:
-    g = b = 255;
-    break;
-  case warp_end:
+  // case warp_start:
+  //   g = b = 255;
+  //   break;
+  case check_point:
     b = 255;
     break;
   case coin_block:
@@ -73,6 +74,7 @@ void otype_to_rgb(object_type& type, int& r, int& g, int& b) {
   case finish:
     r = 255;
     break;
+
   }
 }
 

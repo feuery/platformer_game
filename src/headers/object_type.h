@@ -4,9 +4,8 @@ enum object_type {
   start
  , coinless_block
  , railway_bridge
- , warp_start
- , warp_end
  , coin_block
+  , check_point
  , railway
  , flashlight_guard
   , finish
