@@ -13,7 +13,7 @@ int etsi_lahin_tasan_jaettava(int n, int divisor)
   return nn * divisor;
 }
 
-Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0), running(false), camera_speed(10), wide_x(0), wide_y(0), setting_wide_obj(false), first_set_mouse_unrisen(false)
+Game::Game(int w, int h, const char* title): W(w), H(h),  dragging(false), lastUpdated(0), camera_x(0), camera_y(0), running(false), camera_speed(10), wide_x(0), wide_y(0), setting_wide_obj(false), first_set_mouse_unrisen(false), in_console(false)
 {
   cout<<"Initing everything"<<endl;
   if(SDL_Init(SDL_INIT_EVERYTHING)!=0)
@@ -59,6 +59,14 @@ void Game::do_kbd_up(SDL_Event& e) {
   case SDLK_RIGHT:
     current_type++;
     break;
+  case SDLK_b:
+    in_console = true;
+    // tell user to switch to console
+    draw_hud();
+    printf("New background filename: \n");
+    getline(cin, background_filename);
+
+    in_console = false;
   }
 }
 
@@ -225,6 +233,19 @@ void Game::RunFrame() {
 }
 
 void Game::draw_hud() {
+
+  if(in_console) {
+    SDL_FillRect(window_surface, NULL, SDL_MapRGB(window_surface->format, 0, 0, 0));
+    SDL_Surface* console_text = to_surface ("USE THE CONSOLE");
+    SDL_Rect console_loc = {W / 2 - console_text->w / 2, H / 2, 0, 0};
+    SDL_BlitSurface(console_text, NULL, window_surface, &console_loc);
+    SDL_FreeSurface(console_text);
+
+    SDL_UpdateWindowSurface(window);
+    
+    return;
+  }
+  
   SDL_Surface* text = to_surface((string("Selected type: ")+otype_to_string(current_type)).c_str());
   SDL_Rect text_location = {10, 10, 0, 0};
   SDL_BlitSurface(text, NULL, window_surface, &text_location);
@@ -246,11 +267,23 @@ void Game::draw_hud() {
   new_y += increase_text->h + 5;
   text_location = {10, new_y, 0, 0};
   SDL_BlitSurface(setting_wide_surface, NULL, window_surface, &text_location);
+
+  SDL_Surface* background_fn_surface = to_surface((string("Background's filename: ") + background_filename).c_str());
+  new_y += setting_wide_surface->h + 5;
+  text_location = {10, new_y, 0, 0};
+  SDL_BlitSurface(background_fn_surface, NULL, window_surface, &text_location);
+
+  SDL_Surface* use_console_surface = to_surface("Press B and change to console to set the new filename");
+  new_y += background_fn_surface->h + 5;
+  text_location = {10, new_y, 0, 0};
+  SDL_BlitSurface(use_console_surface, NULL, window_surface, &text_location);
   
   SDL_FreeSurface(text);
   SDL_FreeSurface(camera_text);
   SDL_FreeSurface(increase_text);
   SDL_FreeSurface(setting_wide_surface);
+  SDL_FreeSurface(background_fn_surface);
+  SDL_FreeSurface(use_console_surface);
 }
 
 void Game::drawobjects(){

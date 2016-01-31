@@ -6,6 +6,7 @@
 #include <vector>
 #include <utility>
 #include <queue>
+#include <string>
 
 #include <object_type.h>
 #include <object.h>
@@ -70,8 +71,10 @@ private:
   SDL_Window* window;
   SDL_Surface* window_surface;
 
+  string background_filename;
+
   int W, H, camera_x, camera_y, camera_speed;
-  bool running, dragging;
+  bool running, dragging, in_console;
 
   Uint32 lastUpdated;
 
