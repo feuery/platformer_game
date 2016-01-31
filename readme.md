@@ -16,6 +16,9 @@ Fuck if I know. This is a trivial project to build in Linux, but it's difficult 
   * And I have no interest to use Visual Studio at all
 * Again, I'd love to be proven wrong, but last I checked I couldn't find Windows-binaries for scons, and I haven't bothered to learn to use cmake
 
+# Where are the assets?
+Some assets are done, but because I've heard git is rubbish with larger binary files, I don't have firsthand experience with git and such files, and I had a schedule, I'd love to keep the assets outside of repo as long as possible. They'll be added to the published binaries, of course.
+
 # Future
 When I have time and graphics, I'll do some level design, write the actual game engine to run the files this level editor makes and explore how I should build Windows binaries. This work will be done in this repository
 
